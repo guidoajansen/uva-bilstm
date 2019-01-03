@@ -1,14 +1,6 @@
 """Load packages"""
 
-import numpy as np
-import tensorflow as tf
-
-# from keras.models import Model, load_model
-# from keras.layers import TimeDistributed, Conv1D, Dense, Embedding, Input, Dropout, LSTM, Bidirectional, MaxPooling1D, \
-#     Flatten, concatenate
-# from keras.utils import plot_model
-# from keras.initializers import RandomUniform
-# from keras.optimizers import SGD, Nadam
+import importlib
 
 """Load external scripts"""
 from validation import compute_f1
@@ -24,11 +16,20 @@ LEARNING_RATE = 0.0105    # paper 0.0105
 OPTIMIZER = 'nadam'       # paper uses SGD(lr=self.learning_rate), Nadam() recommended
 
 """Construct and run model"""
-cnn_blstm = bilstm.CNN_BLSTM(EPOCHS, DROPOUT, DROPOUT_RECURRENT, LSTM_STATE_SIZE, CONV_SIZE, LEARNING_RATE, OPTIMIZER)
-cnn_blstm.loadData()
-cnn_blstm.addCharInfo()
-cnn_blstm.embed()
-# cnn_blstm.createBatches()
-# cnn_blstm.buildModel()
-# cnn_blstm.train()
-# cnn_blstm.writeToFile()
+def loadModel():
+    """Reload the model"""
+
+    importlib.reload(bilstm)
+    cnn_blstm = bilstm.CNN_BLSTM(EPOCHS, DROPOUT, DROPOUT_RECURRENT, LSTM_STATE_SIZE, CONV_SIZE, LEARNING_RATE, OPTIMIZER)
+
+    cnn_blstm.loadData()
+    cnn_blstm.addCharInfo()
+    cnn_blstm.embed()
+    cnn_blstm.createBatches()
+    cnn_blstm.buildModel()
+    # cnn_blstm.train()
+    # cnn_blstm.writeToFile()
+
+    return cnn_blstm
+
+MODEL = loadModel()

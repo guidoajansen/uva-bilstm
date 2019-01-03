@@ -133,19 +133,23 @@ class CNN_BLSTM(object):
         chars = tf.layers.max_pooling1d(inputs=chars, pool_size=52, strides=1, name="maxpool")
         chars = tf.contrib.layers.flatten(inputs=chars)
         chars = tf.layers.dropout(inputs=chars, rate=self.dropout)
+        print(chars)
 
         """Word input"""
         word_input =  tf.placeholder(dtype=tf.int32, shape=(None,), name="word_input")
         word_embed = tf.get_variable(name="word_embed", shape=[self.wordEmbeddings.shape[0], self.wordEmbeddings.shape[1]])
         words = tf.nn.embedding_lookup(params=word_embed, ids=word_input)
+        print(words)
 
         """Case input"""
         case_input = tf.placeholder(dtype=tf.int32, shape=(None,), name="case_input")
         case_embed = tf.get_variable(name="case_embed", shape=[self.caseEmbeddings.shape[0], self.caseEmbeddings.shape[1]])
         casing = tf.nn.embedding_lookup(params=case_embed, ids=case_input)
+        print(casing)
 
         """Concat"""
         concat = tf.concat(values=[chars, words, casing], axis=-1)
+        print(concat)
 
         """BLSTM"""
         forward = tf.nn.rnn_cell.BasicLSTMCell(num_units=self.lstm_state_size, forget_bias=1.0)
@@ -153,7 +157,7 @@ class CNN_BLSTM(object):
         backward = tf.nn.rnn_cell.BasicLSTMCell(num_units=self.lstm_state_size, forget_bias=1.0)
         backward = tf.nn.rnn_cell.DropoutWrapper(cell = backward, input_keep_prob=self.dropout, state_keep_prob=self.dropout_recurrent)
 
-        blstm = tf.nn.static_bidirectional_rnn(cell_fw=forward, cell_bw=backward, inputs=(100, 338), dtype=tf.float32)
+        blstm = tf.nn.static_bidirectional_rnn(cell_fw=forward, cell_bw=backward, inputs=concat, dtype=tf.float32)
 
         # output = TimeDistributed(Dense(len(self.label2Idx), activation='softmax'),name="Softmax_layer")(output)
         #
